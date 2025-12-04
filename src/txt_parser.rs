@@ -1,16 +1,31 @@
+//! mod with Text parser logic
 use crate::{Parser, ReadError, Status, Transaction, Type, WriteError};
 
+/// Raw record used by the human-readable text format.
+///
+/// Each field is stored as a separate `KEY: VALUE` line in the file.
 pub struct TxtRecord {
+    /// Unique transaction identifier.
     pub tx_id: u64,
+    /// Kind of transaction.
     pub tx_type: Type,
+    /// Identifier of the sender.
     pub from_user_id: u64,
+    /// Identifier of the recipient.
     pub to_user_id: u64,
+    /// Transaction amount.
     pub amount: u64,
+    /// Timestamp of the transaction.
     pub timestamp: u64,
+    /// Status of the transaction.
     pub status: Status,
+    /// Free-form description.
     pub description: String,
 }
 
+/// Parser for the custom plain text transaction format.
+///
+/// This type implements [`Parser`] for line-based text input and output.
 pub struct TxtParser();
 
 impl From<&Transaction> for TxtRecord {
