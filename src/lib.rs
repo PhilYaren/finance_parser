@@ -281,12 +281,12 @@ pub fn read_file(path: &Path, ext: Extension) -> Result<Vec<Transaction>, ReadEr
 /// # Errors
 ///
 /// Returns a [`WriteError`] if serialization or writing fails.
-pub fn write_data(data: &Vec<Transaction>, file: &File, ext: Extension) -> Result<(), WriteError> {
+pub fn write_data(data: &[Transaction], file: &File, ext: Extension) -> Result<(), WriteError> {
     let mut writer = io::BufWriter::new(file);
 
     match ext {
-        Extension::Csv => CsvParser::write(&data, &mut writer),
-        Extension::Bin => BinParser::write(&data, &mut writer),
-        Extension::Txt => TxtParser::write(&data, &mut writer),
+        Extension::Csv => CsvParser::write(data, &mut writer),
+        Extension::Bin => BinParser::write(data, &mut writer),
+        Extension::Txt => TxtParser::write(data, &mut writer),
     }
 }

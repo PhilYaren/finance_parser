@@ -26,7 +26,7 @@ pub struct BinRecord {
 }
 
 impl BinRecord {
-    fn convert_to_bin(self: &Self) -> (usize, Vec<u8>) {
+    fn convert_to_bin(&self) -> (usize, Vec<u8>) {
         let mut bin_vec = Vec::new();
 
         bin_vec.append(&mut self.tx_id.to_be_bytes().to_vec());
@@ -187,10 +187,10 @@ impl Parser for BinParser {
 
         loop {
             let body_offset = current_ofset + 8;
-            let head_slice = Self::get_slice(&mut buf, current_ofset, 8)?;
+            let head_slice = Self::get_slice(&buf, current_ofset, 8)?;
             let body_size = Self::check_head(head_slice)? as usize;
 
-            let body_slice = Self::get_slice(&mut buf, body_offset, body_size)?;
+            let body_slice = Self::get_slice(&buf, body_offset, body_size)?;
 
             let binary_record = Self::parse_body(body_slice)?;
 
@@ -219,7 +219,7 @@ impl Parser for BinParser {
             buffer.append(&mut (length as u32).to_be_bytes().to_vec());
             buffer.append(&mut byte_record);
 
-            writer.write(&buffer[..])?;
+            writer.write_all(&buffer[..])?;
         }
 
         Ok(())

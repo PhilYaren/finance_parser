@@ -9,6 +9,10 @@ hooks {
                 check = "cargo fmt"
                 exclusive = true
             }
+            ["clippy"] {
+                check = "cargo clippy"
+                exclusive = true
+            }
             ["test"] {
                 check = "cargo test"
                 exclusive = true

@@ -11,19 +11,19 @@ fn main() {
     let first_file_path = Path::new(&args.first_file);
     let second_file_path = Path::new(&args.second_file);
 
-    let first_ext = match get_extension(&args.first_ext, &first_file_path) {
+    let first_ext = match get_extension(&args.first_ext, first_file_path) {
         Ok(ext) => ext,
         Err(err) => {
-            println!("{}", err.to_string());
+            println!("{}", err);
 
             return;
         }
     };
 
-    let second_ext = match get_extension(&args.second_ext, &second_file_path) {
+    let second_ext = match get_extension(&args.second_ext, second_file_path) {
         Ok(ext) => ext,
         Err(err) => {
-            println!("{}", err.to_string());
+            println!("{}", err);
 
             return;
         }
