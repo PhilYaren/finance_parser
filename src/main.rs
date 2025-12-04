@@ -3,44 +3,20 @@ use std::{fs, path::Path};
 
 use finance_parser::{Args, get_extension, read_file, write_data};
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     let path = Path::new(&args.input_file);
 
     // args have priority over initial file extension thus format can be overriden
-    let extension = match get_extension(&args.input_extension, path) {
-        Ok(ext) => ext,
-        Err(err) => {
-            println!("{}", err);
+    let extension = get_extension(&args.input_extension, path)?;
 
-            return;
-        }
-    };
-
-    let data = match read_file(path, extension) {
-        Ok(data) => data,
-        Err(err) => {
-            println!("{}", err);
-
-            return;
-        }
-    };
+    let data = read_file(path, extension)?;
 
     let output_file = format!("{}.{}", args.output_name, args.output_extension);
 
-    let new_file = match fs::File::create(output_file) {
-        Ok(file) => file,
-        Err(err) => {
-            println!("{}", err);
+    let new_file = fs::File::create(output_file)?;
 
-            return;
-        }
-    };
+    write_data(&data, &new_file, args.output_extension)?;
 
-    match write_data(&data, &new_file, args.output_extension) {
-        Ok(()) => (),
-        Err(err) => {
-            println!("{}", err);
-        }
-    }
+    Ok(())
 }
