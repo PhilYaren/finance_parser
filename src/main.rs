@@ -8,10 +8,10 @@ fn main() {
     let path = Path::new(&args.input_file);
 
     // args have priority over initial file extension thus format can be overriden
-    let extension = match get_extension(&args.input_extension, &path) {
+    let extension = match get_extension(&args.input_extension, path) {
         Ok(ext) => ext,
         Err(err) => {
-            println!("{}", err.to_string());
+            println!("{}", err);
 
             return;
         }
@@ -20,7 +20,7 @@ fn main() {
     let data = match read_file(path, extension) {
         Ok(data) => data,
         Err(err) => {
-            println!("{}", err.to_string());
+            println!("{}", err);
 
             return;
         }
@@ -31,18 +31,16 @@ fn main() {
     let new_file = match fs::File::create(output_file) {
         Ok(file) => file,
         Err(err) => {
-            println!("{}", err.to_string());
+            println!("{}", err);
 
             return;
         }
     };
 
     match write_data(&data, &new_file, args.output_extension) {
-        Ok(()) => return,
+        Ok(()) => (),
         Err(err) => {
             println!("{}", err);
-
-            return;
         }
     }
 }

@@ -66,11 +66,11 @@ impl Parser for TxtParser {
                     continue;
                 }
 
-                let (key, value) = entry.split_once(": ").unwrap_or_else(|| (entry, ""));
+                let (key, value) = entry.split_once(": ").unwrap_or((entry, ""));
 
                 match key {
                     "TX_ID" => {
-                        tx_id = match u64::from_str_radix(value, 10) {
+                        tx_id = match value.parse::<u64>() {
                             Ok(value) => Some(value),
                             Err(err) => {
                                 return Err(ReadError::Txt {
@@ -117,7 +117,7 @@ impl Parser for TxtParser {
                         }
                     }
                     "TO_USER_ID" => {
-                        to_user_id = match u64::from_str_radix(value, 10) {
+                        to_user_id = match value.parse::<u64>() {
                             Ok(value) => Some(value),
                             Err(err) => {
                                 return Err(ReadError::Txt {
@@ -132,7 +132,7 @@ impl Parser for TxtParser {
                         };
                     }
                     "FROM_USER_ID" => {
-                        from_user_id = match u64::from_str_radix(value, 10) {
+                        from_user_id = match value.parse::<u64>() {
                             Ok(value) => Some(value),
                             Err(err) => {
                                 return Err(ReadError::Txt {
@@ -147,7 +147,7 @@ impl Parser for TxtParser {
                         };
                     }
                     "AMOUNT" => {
-                        amount = match u64::from_str_radix(value, 10) {
+                        amount = match value.parse::<u64>() {
                             Ok(value) => Some(value),
                             Err(err) => {
                                 return Err(ReadError::Txt {
@@ -162,7 +162,7 @@ impl Parser for TxtParser {
                         };
                     }
                     "TIMESTAMP" => {
-                        timestamp = match u64::from_str_radix(value, 10) {
+                        timestamp = match value.parse::<u64>() {
                             Ok(value) => Some(value),
                             Err(err) => {
                                 return Err(ReadError::Txt {
