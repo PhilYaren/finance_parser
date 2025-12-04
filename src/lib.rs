@@ -79,8 +79,8 @@ impl Display for Status {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Status::Success => write!(f, "SUCCESS"),
-            Status::Pending => write!(f, "FAILURE"),
-            Status::Failure => write!(f, "PENDING"),
+            Status::Failure => write!(f, "FAILURE"),
+            Status::Pending => write!(f, "PENDING"),
         }
     }
 }
@@ -144,21 +144,21 @@ pub fn check_extension(path: &Path) -> Result<Extension, FileError> {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Transaction {
     /// Unique transaction identifier.
-    tx_id: u64,
+    pub tx_id: u64,
     /// Transaction kind (deposit, transfer, withdrawal).
-    tx_type: Type,
+    pub tx_type: Type,
     /// Identifier of the sender.
-    sender_id: u64,
+    pub sender_id: u64,
     /// Identifier of the receiver.
-    recipient_id: u64,
+    pub recipient_id: u64,
     /// Amount of the transaction.
-    amount: u64,
+    pub amount: u64,
     /// Timestamp of the transaction (Unix timestamp).
-    timestamp: u64,
+    pub timestamp: u64,
     /// Current status of the transaction.
-    status: Status,
+    pub status: Status,
     /// Free-form description or comment for the transaction.
-    description: String,
+    pub description: String,
 }
 
 impl From<CsvRecord> for Transaction {
