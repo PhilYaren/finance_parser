@@ -1,14 +1,27 @@
+//! mod with Binary parser logic
 use crate::{Parser, ReadError, Status, Transaction, Type, WriteError};
 
+/// Raw record used by the binary file format.
+///
+/// This struct mirrors the on-disk representation used by [`BinParser`]
+/// and is converted to and from the higher-level [`Transaction`] type.
 #[derive(Debug)]
 pub struct BinRecord {
+    /// Unique transaction identifier.
     pub tx_id: u64,
+    /// Kind of transaction.
     pub tx_type: Type,
+    /// Identifier of the sender.
     pub from_user_id: u64,
+    /// Identifier of the recipient.
     pub to_user_id: u64,
+    /// Transaction amount.
     pub amount: u64,
+    /// Timestamp associated with the record.
     pub timestamp: u64,
+    /// Status as stored in the binary stream.
     pub status: Status,
+    /// Free-form description.
     pub description: String,
 }
 
@@ -49,6 +62,9 @@ impl From<&Transaction> for BinRecord {
     }
 }
 
+/// Parser for the custom binary transaction format.
+///
+/// This type implements [`Parser`] for binary input and output.
 pub struct BinParser();
 
 impl BinParser {

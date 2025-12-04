@@ -1,41 +1,36 @@
-use std::error::Error;
+//! App related errors
+// use std::error::Error;
 use std::fmt::Display;
 use std::io;
+use thiserror::Error;
 
-// errors related to the reading of data specified by format or input
-#[derive(Debug)]
+/// Errors that can occur while reading or parsing transaction data.
+///
+/// The variants are split by format (CSV, binary, text) so that
+/// additional context (entry index, byte offset, line number) can be
+/// attached to the error.
+#[derive(Debug, Error)]
 pub enum ReadError {
-    Io(io::Error),
+    /// Low-level I/O error passed by reader.
+    Io(#[from] io::Error),
 
-    Csv {
-        entry: Option<u32>,
-        message: String,
-    },
+    /// Error parsing CSV data.
+    Csv { entry: Option<u32>, message: String },
 
+    /// Error parsing binary data.
     Bin {
         offset: Option<usize>,
         message: String,
     },
 
+    /// Error parsing the custom text format.
+    ///
+    /// If `record` is present it holds the 1-based line number of the
+    /// record that failed to parse.
     Txt {
         record: Option<usize>,
         message: String,
     },
-}
-
-impl Error for ReadError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            ReadError::Io(error) => Some(error),
-            _ => None,
-        }
-    }
-}
-
-impl From<io::Error> for ReadError {
-    fn from(error: io::Error) -> Self {
-        ReadError::Io(error)
-    }
 }
 
 impl Display for ReadError {
@@ -60,23 +55,28 @@ impl Display for ReadError {
     }
 }
 
-// error related to the writing of data
-#[derive(Debug)]
+/// Errors that can occur while writing or serializing transaction data.
+///
+/// The variants are split by format (CSV, binary, text) so that
+/// additional context (entry index, byte offset, record number) can be
+/// attached to the error.
+#[derive(Debug, Error)]
 pub enum WriteError {
-    Io(io::Error),
+    /// Low-level I/O error passed by writer.
+    Io(#[from] io::Error),
 
-    Csv {
-        entry: Option<u32>,
-        message: String,
-    },
+    /// Error serializing CSV data.
+    Csv { entry: Option<u32>, message: String },
 
+    /// Error serializing binary data.
     Bin {
         offset: Option<usize>,
         message: String,
     },
 
+    /// Error serializing the custom text format.
     Txt {
-        record: Option<u32>,
+        record: Option<usize>,
         message: String,
     },
 }
@@ -110,79 +110,30 @@ impl Display for WriteError {
     }
 }
 
-impl Error for WriteError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            WriteError::Io(e) => Some(e),
-            _ => None,
-        }
-    }
-}
-
-impl From<io::Error> for WriteError {
-    fn from(error: io::Error) -> Self {
-        WriteError::Io(error)
-    }
-}
-
-// Unified IO errors
-#[derive(Debug)]
+/// Unified IO errors
+#[derive(Debug, Error)]
 pub enum ParserError {
-    Read(ReadError),
-    Write(WriteError),
+    /// Error that occurred while reading.
+    #[error("{0}")]
+    Read(#[from] ReadError),
+    /// Error that occurred while writing.
+    #[error("{0}")]
+    Write(#[from] WriteError),
 }
 
-impl Error for ParserError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            ParserError::Read(error) => error.source(),
-            ParserError::Write(error) => error.source(),
-        }
-    }
-}
-
-impl From<ReadError> for ParserError {
-    fn from(error: ReadError) -> Self {
-        Self::Read(error)
-    }
-}
-
-impl From<WriteError> for ParserError {
-    fn from(error: WriteError) -> Self {
-        Self::Write(error)
-    }
-}
-
-impl Display for ParserError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ParserError::Read(error) => error.fmt(f),
-            ParserError::Write(error) => error.fmt(f),
-        }
-    }
-}
-
-// Errors related to files or their extensions
-#[derive(Debug)]
+/// Errors related to files or their extensions.
+///
+/// This type is used when dealing with paths and file system issues,
+/// such as missing files or unsupported extensions.
+#[derive(Debug, Error)]
 pub enum FileError {
+    /// The file has an extension, but it is not one of the supported formats.
+    #[error("Unsupported extension: {0}")]
     ExtensionError(String),
+    /// The file path has no extension at all.
+    #[error("File extension is not provided - please write file in format [example_name].[ext]")]
     NonExistentExtension,
+    /// The file does not exist at the given path.
+    #[error("File does not exist")]
     NonExistentFileError,
-}
-
-impl Error for FileError {}
-
-impl Display for FileError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            FileError::ExtensionError(ref extension) => {
-                write!(f, "Unsupported extension: {extension}")
-            }
-            FileError::NonExistentExtension => write!(
-                f,
-                "File extension is not provided - please write file in format [example_name].[ext]"
-            ),
-            FileError::NonExistentFileError => write!(f, "File does not exist"),
-        }
-    }
 }

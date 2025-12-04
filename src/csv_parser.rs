@@ -1,23 +1,36 @@
+//! mod with CSV parser logic
 use crate::{Parser, ReadError, Status, Transaction, Type, WriteError};
 use serde::{Deserialize, Serialize};
 
+/// Record as it appears in the CSV file format.
+///
+/// Field names are controlled via `serde(rename = ...)` to match
+/// the expected column headers in the input / output CSV.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CsvRecord {
     #[serde(rename = "TX_ID")]
+    /// Unique transaction identifier.
     pub tx_id: u64,
     #[serde(rename = "TX_TYPE")]
+    /// Kind of transaction.
     pub tx_type: Type,
     #[serde(rename = "FROM_USER_ID")]
+    /// Identifier of the sender.
     pub from_user_id: u64,
     #[serde(rename = "TO_USER_ID")]
+    /// Identifier of the recipient.
     pub to_user_id: u64,
     #[serde(rename = "AMOUNT")]
+    /// Transaction amount.
     pub amount: u64,
     #[serde(rename = "TIMESTAMP")]
+    /// Timestamp of the transaction.
     pub timestamp: u64,
     #[serde(rename = "STATUS")]
+    /// Status of the transaction.
     pub status: Status,
     #[serde(rename = "DESCRIPTION")]
+    /// Free-form description.
     pub description: String,
 }
 
@@ -36,6 +49,9 @@ impl From<&Transaction> for CsvRecord {
     }
 }
 
+/// Parser for the CSV transaction format.
+///
+/// This type implements [`Parser`] for CSV input and output.
 pub struct CsvParser();
 
 impl Parser for CsvParser {
